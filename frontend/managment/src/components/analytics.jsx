@@ -388,7 +388,7 @@ const AnalyticsDashboard = () => {
     const fetchAnalytics = async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/sales/analytics?range=${timeRange}`);
+        const { data } = await axios.get(`http://127.0.0.1:5001/api/sales/analytics?range=${timeRange}`);
         setAnalytics(data);
         console.log(data);
       } catch (err) {

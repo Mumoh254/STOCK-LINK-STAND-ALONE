@@ -48,7 +48,7 @@ function ProductForm() {
     if (imageFile) formData.append('image', imageFile);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/products', formData, {
+      const res = await axios.post('http://127.0.0.1:5001/api/products/create', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 

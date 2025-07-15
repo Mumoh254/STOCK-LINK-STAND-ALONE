@@ -16,7 +16,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 const CHART_COLORS = ["#FF4532", "#00C853", "#5856d6", "#ffcc00", "#ff2d55"];
 const DEFAULT_THRESHOLD = 10;
-const API_URL = 'http://localhost:5000/api/products'; // Backend API URL
+const API_URL = 'http://127.0.0.1:5001/api/products'; // Backend API URL
 
 // Define custom styles as a string for TailwindCSS compatibility and overall aesthetics
 const styles = `

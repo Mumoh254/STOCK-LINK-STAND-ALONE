@@ -3,31 +3,30 @@ import {
     Card, Button, Row, Col, Form, Pagination, Alert, Badge,
     Spinner, Modal, Dropdown, InputGroup, Table
 } from 'react-bootstrap';
-import { useCart } from '../context/cartContext'; // Corrected path to cartContext
+import { useCart } from '../context/cartContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import ProductForm from './ProductForm'; // Assuming ProductForm is in the same 'components' folder
+import ProductForm from './ProductForm';
+import { useNavigate } from 'react-router-dom';
 
 // Color palette
 const colors = {
-
     primary: '#FF4532',
     secondary: '#00C853',
     accent: '#FF4500',
     darkText: '#1A202C',
     lightText: '#6c757d',
     background: '#FFFFFF',
-
     cardBg: '#D1D9E6',
     border: '#dee2e6',
     headerBg: '#343a40',
-    hover: '##00C853',
+    hover: '#00C853',
     warning: '#dc3545',
     info: '#17a2b8',
     success: '#28a745',
 };
 
-// Inline SVG Icons (kept as provided, assuming they are defined elsewhere or directly in this file)
+// Inline SVG Icons
 const IconSearch = ({ size = 18, className = '' }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" className={className} viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.088.121l4.353 4.353a1 1 0 0 0 1.414-1.414l-4.353-4.353q-.06-.044-.121-.088zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" /></svg>;
 const IconCategory = ({ size = 18, className = '' }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" className={className} viewBox="0 0 16 16"><path d="M0 2.5A1.5 1.5 0 0 1 1.5 1h13A1.5 1.5 0 0 1 16 2.5v11A1.5 1.5 0 0 1 14.5 15h-13A1.5 1.5 0 0 1 0 13.5zM1.5 2a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-11a.5.5 0 0 0-.5-.5z" /><path d="M2 5.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zm.5-.5H5V8H2.5zm4.5-.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zm.5-.5H10V8H7.5zm4.5-.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zm.5-.5H15V8h-2.5zM2 9.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zm.5-.5H5V12H2.5zM7 9.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zm.5-.5H10V12H7.5zm4.5-.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zm.5-.5H15V12h-2.5z" /></svg>;
 const IconCart = ({ size = 18, className = '' }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" className={className} viewBox="0 0 16 16"><path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.13 4l1.25 5h8.52L13.73 4zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2" /></svg>;
@@ -41,7 +40,10 @@ const IconEdit = ({ size = 18, className = '' }) => <svg xmlns="http://www.w3.or
 const IconTrash = ({ size = 18, className = '' }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" className={className} viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" /><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4H1.5a1 1 0 0 1 0-1H4V2a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v1h1.5a1 1 0 0 1 1 1M5 2v1h6V2a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0-.5.5M3 4H13v9a1 1 0 0 0 1 1H5a1 1 0 0 0 1-1V4z" /></svg>;
 const IconInfoCircle = ({ size = 18, className = '' }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" className={className} viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" /><path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2-.176-.492-.246-.714-.246-.121 0-.279.06-.35.1l-.485 2.15zM8 5.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2" /></svg>;
 const IconShoppingCartPlus = ({ size = 18, className = '' }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" className={className} viewBox="0 0 16 16"><path fillRule="evenodd" d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 2H3a.5.5 0 0 0 0 1h11a.5.5 0 0 0 0-1h-2a2 2 0 1 0 0-2h-1.11l-.401-1.607 1.498-7.985A.5.5 0 0 0 12 4h1.11L15.61 1H14a.5.5 0 0 0 0 1zM6 12a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9z"/></svg>;
+const IconLogout = ({ size = 18, className = '' }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" className={className} viewBox="0 0 16 16"><path fillRule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/><path fillRule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/></svg>;
 
+// Base64 encoded transparent placeholder image
+const transparentPlaceholder = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
@@ -54,25 +56,32 @@ const ProductList = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showViewModal, setShowViewModal] = useState(false);
-    const [showProductList, setShowProductList] = useState(true); // New state to control visibility of product list
     const [sortBy, setSortBy] = useState('name');
     const [sortDirection, setSortDirection] = useState('asc');
-    const { addToCart } = useCart(); // Use the addToCart function from context
+    const { addToCart } = useCart();
     const pageSize = 10;
+    const navigate = useNavigate();
+    const [editPrice, setEditPrice] = useState('');
+    const [editStock, setEditStock] = useState('');
 
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const productsRes = await axios.get('http://127.0.0.1:5000/api/products');
-
+            const productsRes = await axios.get('http://127.0.0.1:5001/api/products');
             const prodList = Array.isArray(productsRes.data) ? productsRes.data : [];
             setProducts(prodList);
 
-            const cats = Array.from(new Set(prodList.map(p => p.category).filter(Boolean)));
+            const cats = Array.from(new Set(prodList.map(p => p.category))).filter(Boolean);
             setCategories(['all', ...cats]);
         } catch (error) {
-            toast.error('Failed to load data');
             console.error("Failed to fetch products:", error);
+            if (error.response && error.response.status === 401) {
+                toast.error('Session expired or unauthorized. Please log in again.');
+                localStorage.removeItem('token');
+                navigate('/login');
+            } else {
+                toast.error('Failed to load data');
+            }
         } finally {
             setLoading(false);
         }
@@ -101,9 +110,9 @@ const ProductList = () => {
             if (sortBy === 'name') {
                 comparison = a.name.localeCompare(b.name);
             } else if (sortBy === 'price') {
-                comparison = (a.price || 0) - (b.price || 0); // Handle undefined/null price
+                comparison = (a.price || 0) - (b.price || 0);
             } else if (sortBy === 'stock') {
-                comparison = (a.stock || 0) - (b.stock || 0); // Handle undefined/null stock
+                comparison = (a.stock || 0) - (b.stock || 0);
             } else if (sortBy === 'category') {
                 comparison = (a.category || '').localeCompare(b.category || '');
             }
@@ -117,58 +126,98 @@ const ProductList = () => {
         currentPage * pageSize
     );
 
-    const handleUpdate = async (productData) => {
+    const handleUpdatePriceStock = async (e) => {
+        e.preventDefault();
         try {
-            const formData = new FormData();
-            Object.entries(productData).forEach(([key, value]) => {
-                if (key !== 'image' || value instanceof File) {
-                    formData.append(key, value);
-                }
-            });
-
-            if (selectedProduct) {
-                await axios.put(`http://localhost:5000/api/products/${selectedProduct.id}`, formData);
-            } else {
-                await axios.post('http://localhost:5000/api/products', formData);
+            const token = localStorage.getItem('token');
+            if (!token) {
+                toast.error('Authentication required. Please log in.');
+                navigate('/login');
+                return;
             }
 
-            toast.success(`Product ${selectedProduct ? 'updated' : 'created'} successfully`);
-            fetchProducts(); // Refetch data
+            await axios.put(
+                `http://127.0.0.1:5001/api/products/${selectedProduct.id}`,
+                { price: editPrice, stock: editStock },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            
+            toast.success('Product updated successfully');
+            fetchProducts();
             setShowEditModal(false);
             setSelectedProduct(null);
         } catch (error) {
-            toast.error(error.response?.data?.error || `Error ${selectedProduct ? 'updating' : 'creating'} product`);
-            console.error(`Error ${selectedProduct ? 'updating' : 'creating'} product:`, error);
+            console.error("Error updating product:", error);
+            if (error.response?.status === 401) {
+                toast.error('Session expired. Please log in again.');
+                localStorage.removeItem('token');
+                navigate('/login');
+            } else {
+                toast.error(error.response?.data?.error || 'Error updating product');
+            }
         }
     };
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://localhost:5000/api/products/${selectedProduct.id}`);
+            const token = localStorage.getItem('token');
+            if (!token) {
+                toast.error('Authentication required. Please log in.');
+                navigate('/login');
+                return;
+            }
+
+            await axios.delete(
+                `http://127.0.0.1:5001/api/products/${selectedProduct.id}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            
             toast.success('Product deleted successfully');
-            fetchProducts(); // Refetch data
+            fetchProducts();
             setShowDeleteModal(false);
             setSelectedProduct(null);
         } catch (error) {
-            toast.error(error.response?.data?.error || 'Error deleting product');
             console.error("Error deleting product:", error);
+            if (error.response?.status === 401) {
+                toast.error('Session expired. Please log in again.');
+                localStorage.removeItem('token');
+                navigate('/login');
+            } else {
+                toast.error(error.response?.data?.error || 'Error deleting product');
+            }
         }
     };
 
-    // Helper for product image URL
     const getProductImageUrl = (imagePath) => {
-        if (!imagePath) {
-            return 'https://via.placeholder.com/150?text=No+Image';
+        if (imagePath) {
+            return `http://127.0.0.1:5001/uploads/${imagePath}`;
         }
-        // Assuming imagePath from backend is relative, adjust if necessary
-        // e.g., if backend returns "/uploads/image.jpg", then:
-        return `http://localhost:5000${imagePath}`;
+        return transparentPlaceholder;
     };
 
+    const handleImageError = (e) => {
+        const img = e.target;
+        if (img.getAttribute('data-tried-default') === 'false') {
+            img.src = transparentPlaceholder;
+            img.setAttribute('data-tried-default', 'true');
+        }
+    };
+
+    const handleEditClick = (product) => {
+        setSelectedProduct(product);
+        setEditPrice(product.price);
+        setEditStock(product.stock);
+        setShowEditModal(true);
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        toast.info('You have been logged out.');
+        navigate('/login');
+    };
 
     return (
         <div className="py-2 px-md-5" style={{ backgroundColor: colors.background, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
-            {/* Custom Styles */}
             <style>
                 {`
                 .stylish-card {
@@ -229,7 +278,7 @@ const ProductList = () => {
 
                 .table-responsive-custom .table {
                     border-collapse: separate;
-                    border-spacing: 0 10px; /* Space between rows */
+                    border-spacing: 0 10px;
                 }
                 .table-responsive-custom .table th {
                     background-color: ${colors.primary};
@@ -257,7 +306,7 @@ const ProductList = () => {
                 }
                 .table-responsive-custom .table td {
                     vertical-align: middle;
-                    border-top: none; /* Remove default table borders */
+                    border-top: none;
                     padding: 1rem;
                 }
                 .table-responsive-custom .table td:first-child {
@@ -272,9 +321,10 @@ const ProductList = () => {
                 .table-responsive-custom .table .product-image {
                     width: 50px;
                     height: 50px;
-                    object-fit: cover;
+                    object-fit: contain;
                     border-radius: 6px;
                     border: 1px solid ${colors.border};
+                    background-color: ${colors.hover};
                 }
 
                 .action-dropdown .dropdown-toggle::after {
@@ -286,7 +336,6 @@ const ProductList = () => {
                     gap: 8px;
                 }
 
-                /* Modal Styling */
                 .modal-content-stylish {
                     border-radius: 12px;
                     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
@@ -323,45 +372,42 @@ const ProductList = () => {
                 .modal-image-preview {
                     width: 100%;
                     height: 200px;
-                    object-fit: contain; /* Changed to contain to show full image without cropping */
+                    object-fit: contain;
                     border-radius: 8px;
                     margin-bottom: 1rem;
                     border: 1px solid ${colors.border};
                     background-color: ${colors.hover};
                 }
-
                 `}
             </style>
 
             <div className="d-flex justify-content-between align-items-center mb-5">
-              
                 <div className="d-flex align-items-center gap-3">
                     <Badge
                         bg="primary"
-                        className=" py-3  d-flex align-items-center"
+                        className="py-3 d-flex align-items-center"
                         style={{ backgroundColor: colors.info, color: 'white', fontSize: '1.1rem', fontWeight: '700' }}
                     >
                         Total Products: <span className="ms-2">{products.length}</span>
                     </Badge>
                     <Button
                         variant="primary"
-                        onClick={() => { setSelectedProduct(null); setShowEditModal(true); setShowProductList(false); }} // Hide product list when adding/editing
+                        onClick={() => { setSelectedProduct(null); setShowEditModal(true); }}
                         className="btn-custom-primary d-flex align-items-center"
                     >
                         <IconPlus className="me-2" /> Add New Product
                     </Button>
                     <Button
-                        variant="info"
-                        onClick={() => setShowProductList(!showProductList)} // Toggle product list visibility
+                        variant="danger"
+                        onClick={handleLogout}
                         className="btn-custom-primary d-flex align-items-center"
-                        style={{ backgroundColor: colors.info, borderColor: colors.info }}
+                        style={{ backgroundColor: colors.warning, borderColor: colors.warning }}
                     >
-                        {showProductList ? 'Hide Products' : 'Show Products'}
+                        <IconLogout className="me-2" /> Logout
                     </Button>
                 </div>
             </div>
 
-            {/* Filter & Sort Section (Always visible) */}
             <Card className="mb-4 stylish-card">
                 <Card.Body className="py-4">
                     <Row className="g-3 align-items-center">
@@ -443,157 +489,190 @@ const ProductList = () => {
                 </Card.Body>
             </Card>
 
-            {/* Product List Table (Conditional Visibility) */}
-            {showProductList && (
-                <>
-                    {loading ? (
-                        <div className="d-flex justify-content-center align-items-center ">
-                            <Spinner animation="border" role="status" style={{ color: colors.primary }}>
-                                <span className="visually-hidden">Loading products...</span>
-                            </Spinner>
-                            <p className="ms-3 fs-5" style={{ color: colors.lightText }}>Loading products...</p>
-                        </div>
-                    ) : filteredProducts.length === 0 ? (
-                        <Alert variant="info" className="text-center  stylish-card">
-                            <IconInfoCircle size={24} className="me-2" /> No products found matching your criteria.
-                        </Alert>
-                    ) : (
-                        <Card className="stylish-card">
-                            <Card.Body className="p-0">
-                                <div className="table-responsive table-responsive-custom">
-                                    <Table hover className="m-0">
-                                        <thead>
-                                            <tr>
-                                                <th>Image</th>
-                                                <th onClick={() => handleSort('name')} className="cursor-pointer">
-                                                    Product Name {sortBy === 'name' && (sortDirection === 'asc' ? <IconChevronUp /> : <IconChevronDown />)}
-                                                </th>
-                                                <th onClick={() => handleSort('category')} className="cursor-pointer">
-                                                    Category {sortBy === 'category' && (sortDirection === 'asc' ? <IconChevronUp /> : <IconChevronDown />)}
-                                                </th>
-                                                <th onClick={() => handleSort('price')} className="cursor-pointer">
-                                                    Price {sortBy === 'price' && (sortDirection === 'asc' ? <IconChevronUp /> : <IconChevronDown />)}
-                                                </th>
-                                                <th onClick={() => handleSort('stock')} className="cursor-pointer">
-                                                    Stock {sortBy === 'stock' && (sortDirection === 'asc' ? <IconChevronUp /> : <IconChevronDown />)}
-                                                </th>
-                                                <th>Actions</th>
-                                                <th>Add to Cart</th> {/* New column for Add to Cart */}
+            <>
+                {loading ? (
+                    <div className="d-flex justify-content-center align-items-center ">
+                        <Spinner animation="border" role="status" style={{ color: colors.primary }}>
+                            <span className="visually-hidden">Loading products...</span>
+                        </Spinner>
+                        <p className="ms-3 fs-5" style={{ color: colors.lightText }}>Loading products...</p>
+                    </div>
+                ) : filteredProducts.length === 0 ? (
+                    <Alert variant="info" className="text-center stylish-card">
+                        <IconInfoCircle size={24} className="me-2" /> No products found matching your criteria.
+                    </Alert>
+                ) : (
+                    <Card className="stylish-card">
+                        <Card.Body className="p-0">
+                            <div className="table-responsive table-responsive-custom">
+                                <Table hover className="m-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Image</th>
+                                            <th onClick={() => handleSort('name')} className="cursor-pointer">
+                                                Product Name {sortBy === 'name' && (sortDirection === 'asc' ? <IconChevronUp /> : <IconChevronDown />)}
+                                            </th>
+                                            <th onClick={() => handleSort('category')} className="cursor-pointer">
+                                                Category {sortBy === 'category' && (sortDirection === 'asc' ? <IconChevronUp /> : <IconChevronDown />)}
+                                            </th>
+                                            <th onClick={() => handleSort('price')} className="cursor-pointer">
+                                                Price {sortBy === 'price' && (sortDirection === 'asc' ? <IconChevronUp /> : <IconChevronDown />)}
+                                            </th>
+                                            <th onClick={() => handleSort('stock')} className="cursor-pointer">
+                                                Stock {sortBy === 'stock' && (sortDirection === 'asc' ? <IconChevronUp /> : <IconChevronDown />)}
+                                            </th>
+                                            <th>Actions</th>
+                                            <th>Add to Cart</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {paginatedProducts.map((product) => (
+                                            <tr key={product.id}>
+                                                <td>
+                                                    <img
+                                                        src={getProductImageUrl(product.image)}
+                                                        alt={product.name}
+                                                        className="product-image"
+                                                        onError={handleImageError}
+                                                        data-tried-default="false"
+                                                    />
+                                                </td>
+                                                <td>{product.name}</td>
+                                                <td><Badge bg="info" style={{ backgroundColor: colors.info, color: 'white' }}>{product.category || 'N/A'}</Badge></td>
+                                                <td>Ksh {product.price ? product.price.toLocaleString() : '0'}</td>
+                                                <td>
+                                                    <Badge bg={product.stock <= product.reorder_threshold ? "danger" : "success"} style={{ backgroundColor: product.stock <= product.reorder_threshold ? colors.warning : colors.success, color: 'white' }}>
+                                                        {product.stock} in Stock
+                                                    </Badge>
+                                                </td>
+                                                <td>
+                                                    <Dropdown align="end" className="action-dropdown">
+                                                        <Dropdown.Toggle variant="light" id={`dropdown-menu-for-${product.id}`}>
+                                                            <IconDotsVerticalRounded />
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu className="dropdown-menu-stylish">
+                                                            <Dropdown.Item
+                                                                className="dropdown-item-stylish"
+                                                                onClick={() => { setSelectedProduct(product); setShowViewModal(true); }}
+                                                            >
+                                                                <IconInfoCircle /> View Details
+                                                            </Dropdown.Item>
+                                                            <Dropdown.Item
+                                                                className="dropdown-item-stylish"
+                                                                onClick={() => handleEditClick(product)}
+                                                            >
+                                                                <IconEdit /> Edit
+                                                            </Dropdown.Item>
+                                                            <Dropdown.Item
+                                                                className="dropdown-item-stylish"
+                                                                onClick={() => { setSelectedProduct(product); setShowDeleteModal(true); }}
+                                                            >
+                                                                <IconTrash /> Delete
+                                                            </Dropdown.Item>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
+                                                </td>
+                                                <td>
+                                                    <Button
+                                                        variant="success"
+                                                        onClick={() => addToCart(product)}
+                                                        className="btn-custom-primary"
+                                                        style={{ backgroundColor: colors.secondary, borderColor: colors.secondary }}
+                                                    >
+                                                        <IconShoppingCartPlus />
+                                                    </Button>
+                                                </td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            {paginatedProducts.map((product) => (
-                                                <tr key={product.id}>
-                                                    <td>
-                                                        <img
-                                                            src={getProductImageUrl(product.image)}
-                                                            alt={product.name}
-                                                            className="product-image"
-                                                        />
-                                                    </td>
-                                                    <td><span className="fw-semibold" style={{ color: colors.darkText }}>{product.name}</span></td>
-                                                    <td><Badge bg="secondary" style={{ backgroundColor: colors.info }}>{product.category || 'N/A'}</Badge></td>
-                                                    <td
-                                                        style={{
-                                                            fontWeight: 'bold'
-                                                        }}> <span style={{
-                                                            color: 'red',
-                                                            fontWeight: 'bold'
-                                                        }}>
-                                                                KSH :</span> {(product.price || 0).toFixed(2)}</td>
-                                                    <td>
-                                                        <Badge bg={product.stock > 10 ? 'success' : product.stock > 0 ? 'warning' : 'danger'}>
-                                                            {product.stock} in stock
-                                                        </Badge>
-                                                    </td>
-                                                    <td>
-                                                        <Dropdown align="end" className="action-dropdown">
-                                                            <Dropdown.Toggle variant="light" size="sm">
-                                                                <IconDotsVerticalRounded />
-                                                            </Dropdown.Toggle>
-                                                            <Dropdown.Menu>
-                                                                <Dropdown.Item onClick={() => { setSelectedProduct(product); setShowViewModal(true); }}>
-                                                                    <IconInfoCircle className="me-2" /> View Details
-                                                                </Dropdown.Item>
-                                                                <Dropdown.Item onClick={() => { setSelectedProduct(product); setShowEditModal(true); setShowProductList(false); }}>
-                                                                    <IconEdit className="me-2" /> Edit
-                                                                </Dropdown.Item>
-                                                                <Dropdown.Item onClick={() => { setSelectedProduct(product); setShowDeleteModal(true); }} className="text-danger">
-                                                                    <IconTrash className="me-2" /> Delete
-                                                                </Dropdown.Item>
-                                                            </Dropdown.Menu>
-                                                        </Dropdown>
-                                                    </td>
-                                                    <td>
-                                                        <Button
-                                                            variant="success"
-                                                            size="sm"
-                                                            onClick={() => addToCart(product)}
-                                                            disabled={product.stock <= 0}
-                                                            className="d-flex align-items-center justify-content-center"
-                                                        >
-                                                            <IconShoppingCartPlus size={16} className="me-1" />
-                                                            Add
-                                                        </Button>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </Table>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                    )}
+                                        ))}
+                                    </tbody>
+                                </Table>
+                            </div>
+                        </Card.Body>
+                    </Card>
+                )}
+            </>
 
-                    {/* Pagination */}
-                    {totalPages > 1 && (
-                        <div className="d-flex justify-content-center mt-4">
-                            <Pagination>
-                                <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
-                                <Pagination.Prev onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1} />
-                                {[...Array(totalPages)].map((_, index) => (
-                                    <Pagination.Item
-                                        key={index + 1}
-                                        active={index + 1 === currentPage}
-                                        onClick={() => setCurrentPage(index + 1)}
-                                    >
-                                        {index + 1}
-                                    </Pagination.Item>
-                                ))}
-                                <Pagination.Next onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages} />
-                                <Pagination.Last onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} />
-                            </Pagination>
-                        </div>
-                    )}
-                </>
+            {totalPages > 1 && (
+                <div className="d-flex justify-content-center mt-4">
+                    <Pagination>
+                        <Pagination.Prev onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1} />
+                        {[...Array(totalPages)].map((_, index) => (
+                            <Pagination.Item
+                                key={index + 1}
+                                active={index + 1 === currentPage}
+                                onClick={() => setCurrentPage(index + 1)}
+                            >
+                                {index + 1}
+                            </Pagination.Item>
+                        ))}
+                        <Pagination.Next onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} />
+                    </Pagination>
+                </div>
             )}
 
-            {/* Product Modals */}
-            <Modal show={showEditModal} onHide={() => { setShowEditModal(false); setSelectedProduct(null); setShowProductList(true); }} centered dialogClassName="modal-90w">
+            {/* Edit Price/Stock Modal */}
+            <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered size="lg" className="modal-content-stylish">
                 <Modal.Header closeButton className="modal-header-stylish">
-                    <Modal.Title className="modal-title-stylish">{selectedProduct ? 'Edit Product' : 'Add New Product'}</Modal.Title>
+                    <Modal.Title className="modal-title-stylish">
+                        {selectedProduct ? 'Edit Product Price and Stock' : 'Add New Product'}
+                    </Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="modal-body-stylish">
-                    <ProductForm
-                        product={selectedProduct}
-                        onSave={handleUpdate}
-                        onCancel={() => { setShowEditModal(false); setSelectedProduct(null); setShowProductList(true); }}
-                    />
+                    {selectedProduct ? (
+                        <Form onSubmit={handleUpdatePriceStock}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Product Name</Form.Label>
+                                <Form.Control type="text" value={selectedProduct.name} readOnly />
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Price (Ksh)</Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    value={editPrice}
+                                    onChange={(e) => setEditPrice(e.target.value)}
+                                    required
+                                />
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Stock Quantity</Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    value={editStock}
+                                    onChange={(e) => setEditStock(e.target.value)}
+                                    required
+                                />
+                            </Form.Group>
+                            <div className="d-flex justify-content-end gap-2">
+                                <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+                                    Cancel
+                                </Button>
+                                <Button variant="primary" type="submit">
+                                    Save Changes
+                                </Button>
+                            </div>
+                        </Form>
+                    ) : (
+                        <ProductForm
+                            product={null}
+                            onSubmit={() => {}}
+                            onCancel={() => setShowEditModal(false)}
+                        />
+                    )}
                 </Modal.Body>
             </Modal>
 
-            <Modal show={showDeleteModal} onHide={() => { setShowDeleteModal(false); setSelectedProduct(null); }} centered>
-                <Modal.Header closeButton className="modal-header-stylish bg-danger">
+            {/* Delete Confirmation Modal */}
+            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered className="modal-content-stylish">
+                <Modal.Header closeButton className="modal-header-stylish">
                     <Modal.Title className="modal-title-stylish">Confirm Delete</Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="modal-body-stylish">
-                    <Alert variant="danger" className="d-flex align-items-center">
-                        <IconInfoCircle size={22} className="me-2" />
-                        Are you sure you want to delete <span className="fw-bold mx-1">{selectedProduct?.name}</span>? This action cannot be undone.
+                    <Alert variant="danger">
+                        Are you sure you want to delete <strong>{selectedProduct?.name}</strong>? This action cannot be undone.
                     </Alert>
                 </Modal.Body>
                 <Modal.Footer className="modal-footer-stylish">
-                    <Button variant="secondary" onClick={() => { setShowDeleteModal(false); setSelectedProduct(null); }}>
+                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
                         Cancel
                     </Button>
                     <Button variant="danger" onClick={handleDelete}>
@@ -602,68 +681,35 @@ const ProductList = () => {
                 </Modal.Footer>
             </Modal>
 
-            <Modal show={showViewModal} onHide={() => { setShowViewModal(false); setSelectedProduct(null); }} centered>
+            {/* View Product Details Modal */}
+            <Modal show={showViewModal} onHide={() => setShowViewModal(false)} centered size="lg" className="modal-content-stylish">
                 <Modal.Header closeButton className="modal-header-stylish">
                     <Modal.Title className="modal-title-stylish">Product Details</Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="modal-body-stylish">
                     {selectedProduct && (
-                        <Card className="stylish-card">
-                            <Card.Body>
-                                <div className="text-center mb-3">
-                                    <img
-                                        src={getProductImageUrl(selectedProduct.image)}
-                                        alt={selectedProduct.name}
-                                        className="modal-image-preview"
-                                    />
-                                </div>
-                                <Table bordered hover responsive>
-                                    <tbody>
-                                        <tr>
-                                            <td className="fw-bold">Name:</td>
-                                            <td>{selectedProduct.name}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="fw-bold">Description:</td>
-                                            <td>{selectedProduct.description || 'N/A'}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="fw-bold">Category:</td>
-                                            <td><Badge bg="info">{selectedProduct.category || 'N/A'}</Badge></td>
-                                        </tr>
-                                        <tr>
-                                            <td className="fw-bold">Price:</td>
-                                            <td><span style={{ color: 'red', fontWeight: 'bold' }}>KSH:</span> {(selectedProduct.price || 0).toFixed(2)}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="fw-bold">Stock:</td>
-                                            <td>
-                                                <Badge bg={selectedProduct.stock > 10 ? 'success' : selectedProduct.stock > 0 ? 'warning' : 'danger'}>
-                                                    {selectedProduct.stock} in stock
-                                                </Badge>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </Table>
-                            </Card.Body>
-                        </Card>
+                        <div>
+                            <img
+                                src={getProductImageUrl(selectedProduct.image)}
+                                alt={selectedProduct.name}
+                                className="modal-image-preview"
+                                onError={handleImageError}
+                                data-tried-default="false"
+                            />
+                            <p><strong>Name:</strong> {selectedProduct.name}</p>
+                            <p><strong>Category:</strong> {selectedProduct.category}</p>
+                            <p><strong>Price:</strong> Ksh {selectedProduct.price?.toLocaleString()}</p>
+                            <p><strong>Stock:</strong> {selectedProduct.stock}</p>
+                            <p><strong>Cost Price:</strong> Ksh {selectedProduct.cost_price?.toLocaleString()}</p>
+                            <p><strong>Reorder Threshold:</strong> {selectedProduct.reorder_threshold}</p>
+                            <p><strong>Created At:</strong> {new Date(selectedProduct.created_at).toLocaleString()}</p>
+                            <p><strong>Last Updated:</strong> {new Date(selectedProduct.updated_at).toLocaleString()}</p>
+                        </div>
                     )}
                 </Modal.Body>
                 <Modal.Footer className="modal-footer-stylish">
-                    <Button variant="secondary" onClick={() => { setShowViewModal(false); setSelectedProduct(null); }}>
+                    <Button variant="secondary" onClick={() => setShowViewModal(false)}>
                         Close
-                    </Button>
-                    <Button
-                        variant="primary"
-                        className="btn-custom-primary"
-                        onClick={() => {
-                            addToCart(selectedProduct);
-                            toast.success(`${selectedProduct.name} added to cart!`);
-                            setShowViewModal(false);
-                        }}
-                        disabled={selectedProduct?.stock <= 0}
-                    >
-                        <IconShoppingCartPlus size={16} className="me-1" /> Add to Cart
                     </Button>
                 </Modal.Footer>
             </Modal>

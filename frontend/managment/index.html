@@ -12,7 +12,7 @@
         script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
         style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
         img-src 'self' data:;
-        connect-src 'self' http://localhost:5000 http://127.0.0.1:5000;
+        connect-src 'self' http://localhost:5001 http://127.0.0.1:5001;
         font-src 'self' https://fonts.gstatic.com;
     ">
 
@@ -24,15 +24,14 @@
     <div id="root"></div>
 
     <script>
-      window.electronAPI.getBackendStatus().then(status => {
-        console.log('✅ Backend running?', status);
-        if (!status) {
-          const root = document.getElementById('root');
-          if (root) {
-            root.innerHTML = '<h2 class="text-center text-danger mt-5">⚠️ Backend not running.</h2>';
-          }
-        }
-      });
+  window.electronAPI.startBackend().then((ready) => {
+  if (ready) {
+    console.log('✅ Backend started!');
+  } else {
+    console.error('❌ Failed to start backend.');
+  }
+});
+
     </script>
 
     <script type="module" src="/src/main.jsx"></script>

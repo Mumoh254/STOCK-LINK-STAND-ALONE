@@ -12,11 +12,11 @@
     "package": "electron-forge package",
     "make": "npm run build && electron-forge make",
     "build-frontend": "npm --prefix ../frontend/managment install && npm --prefix ../frontend/managment run build && shx cp -r ../frontend/managment/dist frontend-dist",
-    "build-backend": "cd scripts/backend && npm install --ignore-scripts --no-optional",
+    "build-backend": "cd scripts/backend && npm install --production --no-optional",
     "rebuild-native": "cd scripts/backend && npx electron-rebuild -f -w better-sqlite3",
     "build": "npm run prebuild && npm run build-frontend && npm run build-backend && npm run rebuild-native",
     "clean": "rimraf frontend-dist dist out",
-    "clean-deep": "rimraf node_modules dist frontend-dist out scripts/backend/node_modules package-lock.json",
+    "clean-deep": "rimraf node_modules dist frontend-dist out package-lock.json",
     "postinstall": "electron-builder install-app-deps",
     "dist": "npm run build && electron-builder --win --x64"
   },
@@ -24,6 +24,10 @@
     "appId": "com.stocklink.app",
     "productName": "Stock Link",
     "asar": true,
+    "asarUnpack": [
+      "node_modules/better-sqlite3/**/*",
+      "scripts/backend/node_modules/better-sqlite3/**/*" 
+    ],
     "directories": {
       "output": "dist",
       "buildResources": "assets"
@@ -31,45 +35,44 @@
     "files": [
       "main.js",
       "preload.js",
-      "frontend-dist/**/*",
       "package.json",
+      "frontend-dist/**/*",
+      "!scripts/backend/**/*", 
       "!**/fsevents*",
       "!**/chokidar/**",
       "!**/nodemon/**",
-      "!node_modules/**/*.map"
+      "!node_modules/**/*.map",
+      "!node_modules/**/test/*",
+      "!node_modules/**/docs/*"
     ],
-"extraResources": [
-  {
-    "from": "scripts/backend",
-    "to": "app.asar.unpacked/scripts/backend",
-    "filter": [
-      "**/*",
-      "!**/node_modules/fsevents/**",
-      "!**/node_modules/fsevents*",
-      "!**/node_modules/chokidar/**",
-      "!**/node_modules/nodemon/**"
-    ]
-  },
-  {
-    "from": "node_modules/better-sqlite3",
-    "to": "app.asar.unpacked/node_modules/better-sqlite3",
-    "filter": ["**/*"]
-  }
-]
-,
-    "asarUnpack": [
-      "scripts/backend/**/*",
-      "node_modules/better-sqlite3/**/*"
+    "extraResources": [
+      {
+        "from": "scripts/backend",
+        "to": "scripts/backend",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "scripts/backend/node_modules",
+        "to": "scripts/backend/node_modules",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "extra_binaries/node", 
+        "to": "extra_binaries/node"    
+      }                             
     ],
     "win": {
       "target": "nsis",
-      "icon": "src/image/favicon.ico"
+      "icon": "src/image/favicon.png"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
+      "createStartMenuShortcut": true,
+      "shortcutName": "Stock Link"
     },
     "nodeGypRebuild": false
   },
@@ -79,21 +82,22 @@
     "@electron-forge/maker-zip": "^7.8.1",
     "@electron-forge/plugin-auto-unpack-natives": "^7.3.0",
     "electron": "^29.4.6",
- "electron-builder": "^26.0.12",
-  
+    "electron-builder": "^26.0.12",
+    "electron-devtools-installer": "^4.0.0",
     "mkdirp": "^3.0.1",
     "nodemon": "^3.1.10",
     "rimraf": "^6.0.1",
     "shx": "^0.4.0"
   },
   "dependencies": {
-      "electron-is-dev": "^2.0.0",
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
     "bwip-js": "^4.7.0",
     "cors": "^2.8.5",
     "detect-port": "^2.1.0",
     "dotenv": "^17.0.1",
+    "electron-is-dev": "^2.0.0",
+    "electron-log": "^5.4.1",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",

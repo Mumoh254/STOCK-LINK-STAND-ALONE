@@ -15,10 +15,10 @@ import styled, { keyframes } from 'styled-components';
 import * as Yup from 'yup';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 
-// --- Jikoni Express Color Palette ---
+// --- Stock Link Color Palette ---
 const colors = {
-  primary: '#FF4532', // Jikoni Red
-  secondary: '#00C853', // Jikoni Green (used for success messages)
+  primary: '#FF4532', // Stock Link Red
+  secondary: '#00C853', // Stock Link Green (used for success messages)
   darkText: '#1A202C', // Dark text for headings
   lightBackground: '#F0F2F5', // Light background for the page
   cardBackground: '#FFFFFF', // White for the form card
@@ -222,7 +222,7 @@ const validationSchema = Yup.object().shape({
     .required('Confirm Password is required')
 });
 
-const BASE_URl = "https://neuro-apps-api-express-js-production-redy.onrender.com/apiV1/smartcity-ke";
+const BASE_URL = "http://127.0.0.1:5001/api"; // Corrected BASE_URL to include /api
 
 const Register = () => {
   const navigate = useNavigate();
@@ -234,12 +234,14 @@ const Register = () => {
       setServerError('');
       setRegistrationSuccess(false); // Reset success message on new submission
 
-      const response = await axios.post(`${BASE_URl}/register`, {
-        Name: values.Name,
-        PhoneNumber: values.PhoneNumber,
-        Email: values.Email,
-        Gender: values.Gender,
-        Password: values.Password,
+      const response = await axios.post(`${BASE_URL}/auth/register`, { // Corrected endpoint
+        username: values.Name, // Changed to 'username' to match backend
+        // PhoneNumber and Gender are not used by the backend's register endpoint currently,
+        // but you can keep them in the form if you plan to use them later.
+        // PhoneNumber: values.PhoneNumber,
+        // Gender: values.Gender,
+        email: values.Email, // Ensure email is sent as 'email'
+        password: values.Password, // Ensure password is sent as 'password'
       });
 
       if (response.status === 201 || response.status === 200) { // Check for successful status codes
@@ -253,7 +255,9 @@ const Register = () => {
         setServerError(response.data?.message || 'Registration failed with an unexpected status.');
       }
     } catch (error) {
-      setServerError(error.response?.data?.message || 'Registration failed. Please try again.');
+      console.error('Registration error:', error);
+      // Use error.response.data.error if available, otherwise a generic message
+      setServerError(error.response?.data?.error || 'Registration failed. Please try again.'); 
     } finally {
       setSubmitting(false);
     }
@@ -264,8 +268,8 @@ const Register = () => {
       <AuthContainer>
         <Header>
           <FiUserPlus className="icon" />
-          <h1>Join Jikoni Express</h1>
-          <p>Create your account to start your culinary journey.</p>
+          <h1>Join Stock Link</h1> {/* Changed text */}
+          <p>Create your account to start managing your inventory efficiently.</p> {/* Changed text */}
         </Header>
 
         <Formik
@@ -343,7 +347,7 @@ const Register = () => {
                     Registering...
                   </>
                 ) : (
-                  'Create Jikoni Account'
+                  'Create Stock Link Account' /* Changed text */
                 )}
               </SubmitButton>
 

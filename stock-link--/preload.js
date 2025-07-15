@@ -1,4 +1,3 @@
-// preload.js
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -6,6 +5,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
 
+  getBackendStatus: () => ipcRenderer.invoke('get-backend-status'),
 
-  getBackendStatus: () => ipcRenderer.invoke('get-backend-status')
+  startBackend: () => ipcRenderer.invoke('start-backend') // ✅ Add this line
 });

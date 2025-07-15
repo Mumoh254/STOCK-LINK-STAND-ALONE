@@ -184,34 +184,46 @@ const CartSidebar = () => {
         return tendered >= total ? tendered - total : 0;
     };
 
-    const initiateMpesaPaymentSimulation = async () => {
-        if (!paymentData.mpesaPhoneNumber || !/^\d{10}$/.test(paymentData.mpesaPhoneNumber)) {
-            alert('Please enter a valid 10-digit M-Pesa phone number (e.g., 07XXXXXXXX).');
-            return;
-        }
+const initiateMpesaPaymentSimulation = async () => {
+  if (!paymentData.mpesaPhoneNumber || !/^\d{10}$/.test(paymentData.mpesaPhoneNumber)) {
+    alert('Please enter a valid 10-digit M-Pesa phone number (e.g., 07XXXXXXXX).');
+    return;
+  }
 
-        setMpesaPaymentStatus('awaiting_confirmation');
-        setProcessing(true);
+  setMpesaPaymentStatus('awaiting_confirmation');
+  setProcessing(true);
 
-        try {
-            // Simulate M-Pesa API call
-            await new Promise(resolve => setTimeout(resolve, 3000));
-            const success = Math.random() > 0.3; 
+  try {
+    const phone = paymentData.mpesaPhoneNumber.replace(/^0/, "254");
+    const amount = calculateTotal(); // ✅ Now using actual cart total
 
-            if (success) {
-                setMpesaPaymentStatus('confirmed');
-            } else {
-                setMpesaPaymentStatus('failed');
-              
-            }
-        } catch (error) {
-            console.error("M-Pesa simulation error:", error);
-            setMpesaPaymentStatus('failed');
-        
-        } finally {
-            setProcessing(false);
-        }
-    };
+    console.log("📤 Sending STK Push request to backend with:", { phone, amount });
+
+    const response = await fetch("http://localhost:5001/api/mpesa/stk-push", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone, amount }),
+    });
+
+    const data = await response.json();
+    console.log("📥 Backend responded:", data);
+
+    if (data.ResponseCode === "0") {
+      alert(`✅ ${data.CustomerMessage || "STK Push sent successfully!"}`);
+      setMpesaPaymentStatus('confirmed');
+    } else {
+      alert(`❌ Payment failed: ${data.errorMessage || 'Unknown error'}`);
+      setMpesaPaymentStatus('failed');
+    }
+
+  } catch (err) {
+    console.error("❌ Error during STK push:", err);
+    alert("Payment request failed. Check if backend is running.");
+    setMpesaPaymentStatus('failed');
+  } finally {
+    setProcessing(false);
+  }
+};
 
     const handleProcessOrder = async () => {
         const total = calculateTotal();
@@ -259,6 +271,7 @@ const CartSidebar = () => {
             setProcessing(false);
         }
     };
+
 
     return (
         <>
@@ -361,7 +374,7 @@ const CartSidebar = () => {
                                 <div className="d-flex justify-content-between mb-3">
                                     <span className="text-muted">Subtotal:</span>
                                     <span className="fw-semibold text-dark fs-5">
-                                        ${calculateTotal().toFixed(2)}
+                                        Kshs {calculateTotal().toFixed(2)}
                                     </span>
                                 </div>
                                 <Button

@@ -47,7 +47,7 @@ router.get('/:id', (req, res) => {
 });
 
 // POST: create a new product
-router.post('/', upload.single('image'), (req, res) => {
+router.post('/create', upload.single('image'), (req, res) => {
   const { name, price, stock, category } = req.body;
   const image = req.file ? req.file.filename : '';
 

@@ -8,7 +8,7 @@
 body {
   font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   background-color: #f5f7fa; /* Very light grey/off-white for a clean canvas */
-  color: #333d47; /* Soft dark grey for main text */
+  color: #3f4b57; /* Soft dark grey for main text */
   margin: 0;
   padding: 0;
 }
@@ -78,151 +78,7 @@ body {
   color: #333d47; /* Consistent dark text */
 }
 
-/* --- */
 
-/* Navbar Styling */
-.app-navbar {
-  background-color: #ffffff; /* Clean white background for navbar */
-  border-bottom: 1px solid #e0e6ed; /* Subtle, light border at the bottom */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Very light, soft shadow */
-  padding: 8px 0; /* More balanced vertical padding */
-}
-
-.app-navbar .container-fluid {
-  padding-left: 30px;
-  padding-right: 30px;
-}
-
-/* Navbar Brand/Logo */
-.app-navbar .navbar-brand {
-  color: #2c5282 !important; /* A professional, deep blue */
-  font-weight: 800;
-  font-size: 2.2rem; /* Prominent brand text */
-  display: flex;
-  align-items: center;
-  transition: all 0.3s ease;
-  letter-spacing: -0.8px;
-}
-
-.app-navbar .navbar-brand:hover {
-  color: #1e3a5f !important; /* Slightly darker blue on hover */
-  transform: translateY(-1px) scale(1.01);
-}
-
-.app-navbar .brand-icon {
-  color: #f7b000; /* A warm, inviting gold for the star */
-  font-size: 1.9rem;
-  filter: drop-shadow(0 0 3px rgba(247, 176, 0, 0.3)); /* Subtle glow */
-}
-
-.gradient-text {
-  background: linear-gradient(45deg, #2b6cb0, #4299e1); /* Soft blue gradient */
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-fill-color: transparent;
-}
-
-/* Navbar Toggler (for mobile) */
-.app-navbar .custom-toggler {
-  border: none !important;
-  padding: 0;
-}
-
-.app-navbar .custom-toggler:focus {
-  box-shadow: none !important;
-  outline: none;
-}
-
-.app-navbar .navbar-toggler-icon-custom {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2844, 82, 130, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important; /* Darker icon for light background */
-}
-
-/* Navigation Links */
-.app-navbar .nav-link-custom {
-  color: #5d738c !important; /* Muted blue-grey for default links */
-  font-weight: 500;
-  padding: 12px 22px; /* Generous padding */
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  position: relative;
-  overflow: hidden;
-}
-
-.app-navbar .nav-link-custom:hover {
-  background-color: #f0f4f8; /* Soft light blue on hover */
-  color: #2c5282 !important; /* Darker blue text on hover */
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Light hover shadow */
-}
-
-.app-navbar .nav-link-custom.active-link {
-  background-color: #e6eff7; /* Slightly darker light blue for active */
-  color: #2c5282 !important; /* Stronger blue for active text */
-  font-weight: 600;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  transform: translateY(-1px);
-}
-
-/* Active indicator line */
-.app-navbar .nav-link-custom.active-link::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 70%; /* Not too wide */
-  height: 3px;
-  background-color: #4299e1; /* Clear blue highlight */
-  border-radius: 2px;
-  animation: drawLine 0.3s forwards ease-out;
-}
-
-@keyframes drawLine {
-  from { width: 0; }
-  to { width: 70%; }
-}
-
-.app-navbar .nav-link-custom svg {
-  margin-right: 10px;
-  font-size: 1.15rem; /* Slightly larger icons */
-  color: #8fa6bd; /* Muted blue-grey for icons */
-  transition: color 0.3s ease;
-}
-
-.app-navbar .nav-link-custom.active-link svg {
-    color: #2c5282; /* Icon matches active link text color */
-}
-
-/* Cart Trigger Button */
-.app-navbar .cart-sidebar-toggle .btn {
-  background-color: #e0e6ed; /* Soft background for cart button */
-  border: 1px solid #c3d4e6; /* Light border */
-  color: #2c5282 !important; /* Professional blue text */
-  font-size: 1.05rem;
-  padding: 10px 25px;
-  border-radius: 30px;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-}
-
-.app-navbar .cart-sidebar-toggle .btn:hover {
-  background-color: #d1dae6 !important;
-  border-color: #aebed6 !important;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.app-navbar .cart-sidebar-toggle .btn svg {
-  margin-right: 8px;
-  color: #4299e1; /* Blue icon */
-}
-
-/* --- */
 
 /* Footer Styling */
 .system-footer {
@@ -622,5 +478,216 @@ textarea.form-control {
   .app-navbar .container-fluid {
     padding-left: 15px;
     padding-right: 15px;
+  }
+}
+
+
+/* Custom CSS Variables for easier theming - Adjusted for White-ish Background */
+:root {
+  --navbar-bg-light: #f8f9fa; /* A very light grey, almost white */
+  --navbar-text-dark: #343a40; /* Dark grey for normal text */
+  --navbar-link-hover: #007bff; /* Primary blue for hover */
+  --navbar-active-color: #007bff; /* Primary blue for active link */
+  --navbar-active-bg: rgba(0, 123, 255, 0.1); /* Light blue tint for active background */
+  --navbar-brand-color: #0056b3; /* Darker blue for brand */
+  --shadow-light: rgba(0, 0, 0, 0.1); /* Lighter shadow for light background */
+  --transition-speed: 0.3s ease;
+  --border-radius-soft: 8px;
+}
+
+/* Base Navbar Styling */
+.app-navbar {
+  background-color: var(--navbar-bg-light);
+  border-bottom: 1px solid #e0e0e0; /* Soft grey border */
+  box-shadow: 0 2px 8px var(--shadow-light); /* Lighter, more subtle shadow */
+  padding: 0.75rem 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navbar Brand Styling */
+.navbar-brand-text {
+  font-weight: 800;
+  font-size: 1.6rem;
+  color: var(--navbar-brand-color);
+  transition: color var(--transition-speed);
+  letter-spacing: 0.05em;
+}
+
+.navbar-brand-text:hover {
+  color: var(--navbar-link-hover);
+}
+
+/* Custom Toggler for a cleaner look */
+.custom-toggler {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.custom-toggler:focus {
+  box-shadow: none !important;
+}
+
+.navbar-toggler-icon-custom {
+  /* This uses a filtered dark SVG icon to show up on light background */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgb(52, 58, 64)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") ;
+}
+
+/* Main Navigation Links Group */
+.nav-links-group {
+  gap: 1.5rem;
+}
+
+/* Nav Link Styling */
+.nav-link-custom {
+  color: var(--navbar-text-dark) !important; /* Dark text on light background */
+  font-weight: 700 !important;
+  padding: 0.6rem 1.2rem !important;
+  border-radius: var(--border-radius-soft);
+  transition: color var(--transition-speed), background-color var(--transition-speed), transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-link-custom::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 3px;
+  background-color: var(--navbar-link-hover);
+  transition: width var(--transition-speed) ease-out;
+}
+
+.nav-link-custom:hover {
+  color: var(--navbar-link-hover) !important;
+  background-color: rgba(0, 123, 255, 0.05) !important; /* Lighter blue tint for hover */
+  transform: translateY(-3px);
+}
+
+.nav-link-custom:hover::before {
+  width: 100%;
+}
+
+/* Active Link Styling */
+.nav-link-custom.active-link {
+  color: var(--navbar-active-color) !important;
+  background-color: var(--navbar-active-bg) !important;
+  font-weight: 700 !important;
+  transform: scale(1.02);
+}
+
+.nav-link-custom.active-link .nav-icon {
+  color: var(--navbar-active-color) !important;
+}
+
+.nav-link-custom.active-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: var(--navbar-active-color);
+  border-radius: 0 0 var(--border-radius-soft) var(--border-radius-soft);
+  animation: slideInBottom 0.3s forwards;
+  transform: translateX(0) !important;
+  opacity: 1 !important;
+}
+
+.nav-link-custom.active-link:hover::before {
+  width: 0;
+}
+
+.nav-link-custom .nav-icon {
+  font-size: 1.3em;
+  vertical-align: middle;
+  transition: color var(--transition-speed);
+}
+
+.nav-link-custom .nav-text {
+  vertical-align: middle;
+}
+
+/* Logout Button Styling */
+.logout-button {
+  background-color: #dc3545; /* Bootstrap danger red */
+  border-color: #dc3545;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--border-radius-soft);
+  transition: background-color var(--transition-speed), transform 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: #c82333; /* Darker red on hover */
+  border-color: #bd2130;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+  .app-navbar .navbar-collapse {
+    background-color: var(--navbar-bg-light); /* Mobile menu also light */
+    border-top: 1px solid #e0e0e0;
+    padding: 1.5rem 1rem;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    box-shadow: 0 8px 15px var(--shadow-light);
+    z-index: 10;
+  }
+
+  .app-navbar .navbar-nav {
+    flex-direction: column;
+    width: 100%;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .nav-link-custom {
+    padding: 1rem 1.5rem;
+    justify-content: flex-start;
+    width: 100%;
+    border-radius: 0;
+  }
+
+  /* Mobile active indicator: left border */
+  .nav-link-custom.active-link {
+    border-left: 5px solid var(--navbar-active-color) !important;
+    background-color: var(--navbar-active-bg) !important;
+    padding-left: calc(1.5rem - 5px) !important;
+    border-bottom: none !important;
+    transform: none;
+  }
+
+  .nav-link-custom.active-link::before {
+    display: none;
+  }
+
+  .ms-auto {
+    margin-left: 0 !important;
+    margin-top: 1.5rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+/* Animation for active state indicator */
+@keyframes slideInBottom {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
